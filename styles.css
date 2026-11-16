@@ -43,3 +43,27 @@ button{font:inherit;cursor:pointer}
 .auth-account-email{color:var(--muted);font-size:14px;overflow-wrap:anywhere}
 .auth-legal{margin:17px 0 0;color:#887a9e;font-size:10px;line-height:1.5}
 @media(max-width:520px){.auth-dialog{padding:30px 21px 23px}.auth-dialog h2{font-size:25px}}
+
+/* NyanDex account dashboard and email/password authentication */
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 20px;padding:5px;border:1px solid #ffffff20;border-radius:8px;background:#120d23}
+.auth-tab{border:0;border-radius:5px;padding:10px;background:transparent;color:var(--muted);font:600 13px 'Space Grotesk',sans-serif}
+.auth-tab.active{background:#ff75c8;color:#24132b}
+.auth-form{display:grid;gap:10px;text-align:left}
+.auth-form label{font:11px 'DM Mono',monospace;letter-spacing:1px;color:#d6c9e8;text-transform:uppercase}
+.auth-form input{width:100%;height:48px;border:1px solid #ffffff30;border-radius:7px;background:#120d23;color:var(--text);padding:0 14px;font:15px 'Space Grotesk',sans-serif;outline:none}
+.auth-form input:focus{border-color:var(--pink);box-shadow:0 0 0 3px #ff75c822}
+.auth-submit{width:100%;margin-top:8px;display:flex;justify-content:center;align-items:center;gap:12px;border:0}
+.forgot-password{display:block;margin:12px auto 0}
+.auth-submit:disabled,.auth-text-button:disabled{opacity:.6;cursor:wait}
+.dashboard{min-height:100vh;max-width:1180px;margin:auto;padding:45px 28px 24px}
+.dashboard-welcome{padding:55px 0 38px}
+.dashboard-welcome h1{font-size:clamp(42px,7vw,68px);margin:18px 0;letter-spacing:-3px}
+.dashboard-welcome h1 span{color:var(--pink)}
+.repos-empty{min-height:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:35px 22px;border:1px solid #ffffff20;border-radius:14px;background:linear-gradient(145deg,#241c3b,#19132b)}
+.empty-mascot{width:130px;height:100px;object-fit:contain;image-rendering:pixelated;margin-bottom:16px}
+.repos-empty h2{font-size:clamp(28px,5vw,42px);letter-spacing:-1.5px;margin:10px 0}
+.repos-empty>p:not(.eyebrow):not(.auth-message){max-width:510px;color:var(--muted);line-height:1.7;font-size:14px}
+.repos-empty .button{margin-top:18px;border:0}
+.dashboard-footer{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:28px 0 8px;color:#a99abf;font-size:12px}
+.dashboard-footer .auth-text-button{margin:0}
+@media(max-width:600px){.dashboard{padding:25px 18px}.dashboard-welcome{padding:45px 0 28px}.dashboard-footer{flex-wrap:wrap}.dashboard-footer>span{order:3;width:100%}}
