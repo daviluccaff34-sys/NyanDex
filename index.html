@@ -8,7 +8,7 @@
   <title>NyanDex — Your creative universe</title>
   <link rel="icon" href="assets/nyan-cat.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
   <script type="module" src="script.js"></script>
 </head>
 <body>
@@ -151,7 +151,7 @@
         <label for="auth-password">Senha</label>
         <input id="auth-password" name="password" type="password" autocomplete="current-password" placeholder="Sua senha" required minlength="8" maxlength="72">
         <div id="captcha-container" class="captcha-container">
-          <div class="cf-turnstile" data-sitekey="0x4AAAAAAGEKLWDKySu5ETD-" data-theme="dark" data-callback="onNyanTurnstileSuccess" data-expired-callback="onNyanTurnstileExpired"></div>
+          <div id="nyan-turnstile"></div>
         </div>
         <button class="button button-primary auth-submit" id="auth-submit" type="submit">Entrar <span>→</span></button>
       </form>
