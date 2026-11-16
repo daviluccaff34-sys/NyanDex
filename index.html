@@ -87,14 +87,43 @@
       <h1>Olá, <span id="dashboard-user">criador</span>!</h1>
       <p class="hero-text">Tudo pronto para tirar suas ideias do papel.</p>
     </section>
-    <section class="repos-empty" id="repos-empty">
-      <img src="assets/nyan-cat.svg" alt="" class="empty-mascot">
-      <p class="eyebrow">SEUS REPOSITÓRIOS</p>
-      <h2>Crie seu primeiro repo!!</h2>
-      <p>Seu espaço de projetos começa aqui. Em breve você poderá criar e organizar seus repositórios diretamente no NyanDex.</p>
-      <button class="button button-primary" id="create-first-repo" type="button">Criar meu primeiro repo <span>→</span></button>
-      <p class="auth-message" id="repo-message" role="status" aria-live="polite"></p>
+    <section class="repo-home" id="repo-home">
+      <div class="repo-home-heading"><div><p class="eyebrow">SEUS REPOSITÓRIOS</p><h2>Seu espaço de criação.</h2></div><button class="button button-primary" id="create-first-repo" type="button">+ Novo repositório</button></div>
+      <div class="repo-list" id="repo-list"></div>
+      <section class="repos-empty" id="repos-empty" hidden>
+        <img src="assets/nyan-cat.svg" alt="" class="empty-mascot">
+        <p class="eyebrow">SEUS REPOSITÓRIOS</p><h2>Crie seu primeiro repo!!</h2>
+        <p>Seu espaço de projetos começa aqui. Crie um repositório para guardar seus códigos e arquivos.</p>
+        <button class="button button-primary" id="create-first-repo-empty" type="button">Criar meu primeiro repo <span>→</span></button>
+      </section>
     </section>
+    <section class="workspace" id="workspace" hidden>
+      <div class="workspace-top"><button class="auth-text-button" id="back-repos">← Repositórios</button><span id="workspace-visibility"></span></div>
+      <h2 id="workspace-title"></h2><p id="workspace-description"></p>
+      <div class="workspace-tabs"><button class="workspace-tab active" data-panel="code">Código</button><button class="workspace-tab" data-panel="files">Arquivos</button><button class="workspace-tab" data-panel="actions">Nyan Actions</button><button class="workspace-tab" data-panel="settings">Configurações</button></div>
+      <section class="workspace-panel" id="panel-code">
+        <div class="panel-heading"><div><h3>Editor de código</h3><p>Crie e edite arquivos de texto do seu projeto.</p></div><button class="button button-primary" id="new-code-file">+ Novo arquivo</button></div>
+        <div class="editor-layout"><aside class="file-tree" id="code-file-list"></aside><div class="code-editor"><input id="code-path" placeholder="exemplo.js" aria-label="Caminho do arquivo"><textarea id="code-content" spellcheck="false" placeholder="// Escreva seu código aqui..."></textarea><button class="button button-primary" id="save-code">Salvar arquivo</button><p id="code-message" class="auth-message"></p></div></div>
+      </section>
+      <section class="workspace-panel" id="panel-files" hidden>
+        <div class="panel-heading"><div><h3>Importar arquivos</h3><p>Envie arquivos do seu dispositivo (até 10 MB por arquivo).</p></div><label class="button button-primary file-picker">Selecionar arquivos<input id="import-files" type="file" multiple hidden></label></div>
+        <div id="asset-list" class="asset-list"></div><p id="file-message" class="auth-message"></p>
+      </section>
+      <section class="workspace-panel" id="panel-actions" hidden>
+        <div class="panel-heading"><div><h3>Nyan Actions</h3><p>Monte workflows e salve suas automações.</p></div><button class="button button-primary" id="new-action">+ Criar Action</button></div>
+        <div id="action-list" class="action-list"></div>
+        <p class="action-note">Nesta primeira etapa, as Actions podem ser criadas e configuradas. A execução automática será ativada quando o motor de workflows estiver pronto.</p>
+      </section>
+      <section class="workspace-panel" id="panel-settings" hidden>
+        <form id="repo-settings-form" class="repo-form">
+          <label>Nome<input id="settings-name" maxlength="80" required></label><label>Descrição<input id="settings-description" maxlength="500"></label>
+          <label>Visibilidade<select id="settings-visibility"><option value="private">Privado</option><option value="public">Público</option></select></label>
+          <button class="button button-primary" type="submit">Salvar configurações</button><p id="settings-message" class="auth-message"></p>
+        </form>
+      </section>
+    </section>
+    <div class="small-modal" id="repo-modal" hidden><section class="small-dialog"><button class="auth-close" id="repo-modal-close" type="button">×</button><p class="eyebrow">NOVO REPOSITÓRIO</p><h2>Criar seu espaço.</h2><form id="repo-create-form" class="repo-form"><label>Nome<input id="repo-name" maxlength="80" required placeholder="meu-projeto"></label><label>Descrição<input id="repo-description" maxlength="500" placeholder="Sobre este projeto"></label><label>Visibilidade<select id="repo-visibility"><option value="private">Privado</option><option value="public">Público</option></select></label><button class="button button-primary" type="submit">Criar repositório</button><p id="repo-create-message" class="auth-message"></p></form></section></div>
+    <div class="small-modal" id="action-modal" hidden><section class="small-dialog"><button class="auth-close" id="action-modal-close" type="button">×</button><p class="eyebrow">NYAN ACTIONS</p><h2>Nova automação.</h2><form id="action-create-form" class="repo-form"><label>Nome da Action<input id="action-name" maxlength="100" required placeholder="Build do projeto"></label><label>Descrição<input id="action-description" maxlength="500" placeholder="O que ela deve fazer?"></label><label>Gatilho<select id="action-trigger"><option value="manual">Manual</option><option value="push">Ao atualizar o repositório (futuro)</option></select></label><label>Etapas (uma por linha)<textarea id="action-steps" rows="4" placeholder="Ex.: instalar dependências&#10;Executar testes"></textarea></label><button class="button button-primary" type="submit">Salvar Action</button><p id="action-create-message" class="auth-message"></p></form></section></div>
     <footer class="dashboard-footer">
       <a class="brand footer-brand" href="#"><img src="assets/nyan-cat.svg" alt=""><span>Nyan<span class="brand-accent">Dex</span></span></a>
       <span id="dashboard-email"></span>
