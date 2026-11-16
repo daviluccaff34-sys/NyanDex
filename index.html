@@ -22,7 +22,7 @@
       <a href="#recursos">Recursos</a>
       <a href="#sobre">Sobre</a>
     </nav>
-    <button class="top-cta" id="auth-open" type="button">Entrar <span aria-hidden="true">↗</span></button>
+    <a class="top-cta" id="auth-open" href="/login">Entrar <span aria-hidden="true">↗</span></a>
   </header>
   <main>
     <section class="hero">
@@ -31,7 +31,7 @@
         <h1>Seus projetos.<br><span>Seu universo.</span></h1>
         <p class="hero-text">Crie, organize e compartilhe seus projetos em um só lugar. Bem-vindo ao NyanDex!</p>
         <div class="hero-actions">
-          <button class="button button-primary" id="hero-login" type="button">Criar conta grátis <span>→</span></button>
+          <a class="button button-primary" id="hero-login" href="/signup">Criar conta grátis <span>→</span></a>
           <a class="button button-quiet" href="#sobre">Saiba mais</a>
         </div>
         <div class="hero-foot"><span>✦</span> Feito para quem gosta de criar coisas incríveis.</div>
@@ -89,7 +89,7 @@
       <p class="hero-text">Tudo pronto para tirar suas ideias do papel.</p>
     </section>
     <section class="repo-home" id="repo-home">
-      <div class="repo-home-heading"><div><p class="eyebrow">SEUS REPOSITÓRIOS</p><h2>Seu espaço de criação.</h2></div><button class="button button-primary" id="create-first-repo" type="button">+ Novo repositório</button></div>
+      <div class="repo-home-heading"><div><p class="eyebrow">SEUS REPOSITÓRIOS</p><h2>Seu espaço de criação.</h2></div><a class="button button-primary" id="create-first-repo" href="/new">+ Novo repositório</a></div>
       <div class="repo-list" id="repo-list"></div><p class="auth-message" id="repo-message" role="status" aria-live="polite"></p>
       <section class="repos-empty" id="repos-empty" hidden>
         <img src="assets/nyan-cat.svg" alt="" class="empty-mascot">
@@ -104,7 +104,7 @@
       <div class="workspace-tabs"><button class="workspace-tab active" data-panel="code">Código</button><button class="workspace-tab" data-panel="files">Arquivos</button><button class="workspace-tab" data-panel="actions">Nyan Actions</button><button class="workspace-tab" data-panel="settings">Configurações</button></div>
       <section class="workspace-panel" id="panel-code">
         <div class="panel-heading"><div><h3>Editor de código</h3><p>Crie e edite arquivos de texto do seu projeto.</p></div><button class="button button-primary" id="new-code-file">+ Novo arquivo</button></div>
-        <div class="editor-layout"><aside class="file-tree" id="code-file-list"></aside><div class="code-editor"><input id="code-path" placeholder="exemplo.js" aria-label="Caminho do arquivo"><textarea id="code-content" spellcheck="false" placeholder="// Escreva seu código aqui..."></textarea><button class="button button-primary" id="save-code">Salvar arquivo</button><p id="code-message" class="auth-message"></p></div></div>
+        <div class="editor-layout"><aside class="file-tree" id="code-file-list"></aside><div class="code-editor"><input id="code-path" placeholder="exemplo.js" aria-label="Caminho do arquivo"><p class="editor-hint">Clique em “Novo arquivo”, informe o nome, escreva o conteúdo e pressione “Salvar arquivo”.</p><textarea id="code-content" spellcheck="false" placeholder="// Escreva seu código aqui..."></textarea><button class="button button-primary" id="save-code">Salvar arquivo</button><p id="code-message" class="auth-message"></p></div></div>
       </section>
       <section class="workspace-panel" id="panel-files" hidden>
         <div class="panel-heading"><div><h3>Importar arquivos</h3><p>Envie arquivos do seu dispositivo (até 10 MB por arquivo).</p></div><label class="button button-primary file-picker">Selecionar arquivos<input id="import-files" type="file" multiple hidden></label></div>
