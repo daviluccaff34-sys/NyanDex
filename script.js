@@ -2,166 +2,171 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.119.0';
 
 const SUPABASE_URL = 'https://jeqfsamjudycbkihfgda.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_IRJlWZcK5G9BZxMom1CUEg_Mg8mTlZW';
+
+// Supabase mantém a sessão no armazenamento local do navegador por padrão.
 const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
 const modal = document.getElementById('auth-modal');
+const dashboard = document.getElementById('dashboard');
 const openButton = document.getElementById('auth-open');
-const emailForm = document.getElementById('email-form');
-const otpForm = document.getElementById('otp-form');
-const accountPanel = document.getElementById('auth-account');
+const authForm = document.getElementById('auth-form');
 const emailInput = document.getElementById('auth-email');
-const codeInput = document.getElementById('auth-code');
+const passwordInput = document.getElementById('auth-password');
 const message = document.getElementById('auth-message');
+const title = document.getElementById('auth-title');
 const description = document.getElementById('auth-description');
-let pendingEmail = '';
+const submitButton = document.getElementById('auth-submit');
+const loginTab = document.getElementById('show-login');
+const signupTab = document.getElementById('show-signup');
+const forgotButton = document.getElementById('forgot-password');
+let mode = 'login';
 
 function showMessage(text, isError = false) {
   message.textContent = text;
   message.classList.toggle('error', isError);
 }
-function openAuth() {
+function openAuth(nextMode = 'login') {
   modal.hidden = false;
   document.body.style.overflow = 'hidden';
+  setMode(nextMode);
   emailInput.focus();
 }
 function closeAuth() {
   modal.hidden = true;
   document.body.style.overflow = '';
 }
-function showEmailStep() {
-  emailForm.hidden = false;
-  otpForm.hidden = true;
-  accountPanel.hidden = true;
-  description.textContent = 'Digite seu e-mail. Vamos enviar um código de 6 dígitos para confirmar que ele é seu.';
+function setMode(nextMode) {
+  mode = nextMode;
+  const signingUp = mode === 'signup';
+  title.textContent = signingUp ? 'Crie sua conta.' : 'Entre no seu universo.';
+  description.textContent = signingUp
+    ? 'Crie sua conta NyanDex com e-mail e senha.'
+    : 'Acesse seus projetos com seu e-mail e senha.';
+  submitButton.innerHTML = signingUp ? 'Criar conta <span>→</span>' : 'Entrar <span>→</span>';
+  passwordInput.autocomplete = signingUp ? 'new-password' : 'current-password';
+  loginTab.classList.toggle('active', !signingUp);
+  signupTab.classList.toggle('active', signingUp);
+  loginTab.setAttribute('aria-selected', String(!signingUp));
+  signupTab.setAttribute('aria-selected', String(signingUp));
+  forgotButton.hidden = signingUp;
   showMessage('');
 }
-function showOtpStep() {
-  emailForm.hidden = true;
-  otpForm.hidden = false;
-  accountPanel.hidden = true;
-  description.textContent = 'Confira sua caixa de entrada e digite abaixo o código de 6 dígitos que enviamos.';
-  codeInput.value = '';
-  codeInput.focus();
-}
-function showAccount(user) {
-  emailForm.hidden = true;
-  otpForm.hidden = true;
-  accountPanel.hidden = false;
-  description.textContent = 'Sua conta NyanDex está pronta.';
-  document.getElementById('auth-account-email').textContent = user.email || '';
+function showDashboard(user) {
+  modal.hidden = true;
+  document.body.style.overflow = '';
+  document.querySelector('body > header').hidden = true;
+  document.querySelector('body > main:not(#dashboard)').hidden = true;
+  document.querySelector('body > footer').hidden = true;
+  dashboard.hidden = false;
+  const email = user.email || '';
+  const shortName = email.includes('@') ? email.split('@')[0] : 'criador';
+  document.getElementById('dashboard-user').textContent = shortName;
+  document.getElementById('dashboard-email').textContent = email;
   openButton.textContent = 'Minha conta';
-  showMessage('');
 }
-function translateError(error) {
-  const msg = (error?.message || '').toLowerCase();
-  if (msg.includes('rate limit') || msg.includes('too many')) return 'Muitas tentativas. Aguarde um pouco e tente novamente.';
-  if (msg.includes('invalid') || msg.includes('expired')) return 'Código inválido ou expirado. Peça um novo código.';
-  if (msg.includes('email')) return 'Não foi possível enviar para esse e-mail. Confira o endereço e tente novamente.';
-  return 'Ocorreu um erro. Tente novamente em instantes.';
+function showLanding() {
+  dashboard.hidden = true;
+  document.querySelector('body > header').hidden = false;
+  document.querySelector('body > main:not(#dashboard)').hidden = false;
+  document.querySelector('body > footer').hidden = false;
+  openButton.textContent = 'Entrar ↗';
+}
+function readableError(error) {
+  const raw = (error?.message || '').toLowerCase();
+  if (raw.includes('invalid login credentials')) return 'E-mail ou senha incorretos.';
+  if (raw.includes('already registered') || raw.includes('already been registered')) return 'Esse e-mail já tem uma conta. Tente entrar.';
+  if (raw.includes('password') && raw.includes('least')) return 'Use uma senha mais forte, com pelo menos 8 caracteres.';
+  if (raw.includes('rate limit') || raw.includes('too many')) return 'Muitas tentativas. Espere um pouco e tente novamente.';
+  if (raw.includes('email not confirmed')) return 'Confirme seu e-mail pelo link enviado antes de entrar.';
+  return error?.message || 'Não foi possível concluir. Confira os dados e tente novamente.';
 }
 
-openButton.addEventListener('click', async () => {
-  openAuth();
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session?.user) showAccount(session.user);
-  else showEmailStep();
-});
-document.getElementById('hero-login').addEventListener('click', () => {
-  openAuth();
-  showEmailStep();
-});
+openButton.addEventListener('click', () => openAuth('login'));
+document.getElementById('hero-login').addEventListener('click', () => openAuth('signup'));
+loginTab.addEventListener('click', () => setMode('login'));
+signupTab.addEventListener('click', () => setMode('signup'));
 document.getElementById('auth-close').addEventListener('click', closeAuth);
 document.getElementById('auth-close-backdrop').addEventListener('click', closeAuth);
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && !modal.hidden) closeAuth();
 });
 
-emailForm.addEventListener('submit', async event => {
+authForm.addEventListener('submit', async event => {
   event.preventDefault();
   const email = emailInput.value.trim().toLowerCase();
-  if (!email) return;
-  const submit = emailForm.querySelector('button[type="submit"]');
-  submit.disabled = true;
-  submit.textContent = 'Enviando...';
+  const password = passwordInput.value;
+  if (!email || !password) return;
+  submitButton.disabled = true;
+  submitButton.textContent = mode === 'signup' ? 'Criando conta...' : 'Entrando...';
   showMessage('');
   try {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: true }
-    });
-    if (error) throw error;
-    pendingEmail = email;
-    showOtpStep();
-    showMessage('Código solicitado para ' + email + '. Confira também o spam.');
+    if (mode === 'signup') {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin }
+      });
+      if (error) throw error;
+      if (data.session?.user) {
+        showDashboard(data.session.user);
+      } else {
+        showMessage('Conta criada! Confira seu e-mail e clique no link de confirmação para ativá-la.');
+      }
+    } else {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      if (data.user) showDashboard(data.user);
+    }
   } catch (error) {
-    showMessage(translateError(error), true);
+    showMessage(readableError(error), true);
   } finally {
-    submit.disabled = false;
-    submit.innerHTML = 'Enviar código <span>→</span>';
+    submitButton.disabled = false;
+    submitButton.innerHTML = mode === 'signup' ? 'Criar conta <span>→</span>' : 'Entrar <span>→</span>';
   }
 });
 
-otpForm.addEventListener('submit', async event => {
-  event.preventDefault();
-  const token = codeInput.value.trim();
-  if (!/^[0-9]{6}$/.test(token) || !pendingEmail) {
-    showMessage('Digite os 6 números do código recebido.', true);
+forgotButton.addEventListener('click', async () => {
+  const email = emailInput.value.trim().toLowerCase();
+  if (!email) {
+    showMessage('Digite seu e-mail primeiro para receber o link de recuperação.', true);
+    emailInput.focus();
     return;
   }
-  const submit = otpForm.querySelector('button[type="submit"]');
-  submit.disabled = true;
-  submit.textContent = 'Verificando...';
-  showMessage('');
+  forgotButton.disabled = true;
+  showMessage('Enviando link de recuperação...');
   try {
-    const { data, error } = await supabase.auth.verifyOtp({
-      email: pendingEmail,
-      token,
-      type: 'email'
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin
     });
     if (error) throw error;
-    if (data.user) showAccount(data.user);
-    showMessage('E-mail confirmado. Bem-vindo ao NyanDex!');
+    showMessage('Se esse e-mail tiver uma conta, enviaremos um link para redefinir a senha.');
   } catch (error) {
-    showMessage(translateError(error), true);
+    showMessage(readableError(error), true);
   } finally {
-    submit.disabled = false;
-    submit.innerHTML = 'Confirmar e entrar <span>→</span>';
+    forgotButton.disabled = false;
   }
 });
 
-document.getElementById('resend-code').addEventListener('click', async () => {
-  if (!pendingEmail) return;
-  showMessage('Solicitando outro código...');
-  try {
-    const { error } = await supabase.auth.signInWithOtp({
-      email: pendingEmail,
-      options: { shouldCreateUser: true }
-    });
-    if (error) throw error;
-    showMessage('Outro código foi solicitado. Confira sua caixa de entrada.');
-  } catch (error) {
-    showMessage(translateError(error), true);
-  }
+document.getElementById('create-first-repo').addEventListener('click', () => {
+  document.getElementById('repo-message').textContent = 'A criação de repositórios está sendo construída. Seus projetos ficarão aqui!';
 });
-document.getElementById('change-email').addEventListener('click', () => {
-  showEmailStep();
-  emailInput.focus();
-});
-document.getElementById('auth-signout').addEventListener('click', async () => {
+document.getElementById('dashboard-signout').addEventListener('click', async () => {
   const { error } = await supabase.auth.signOut();
   if (error) {
-    showMessage('Não foi possível sair agora. Tente novamente.', true);
+    document.getElementById('repo-message').textContent = 'Não foi possível sair agora. Tente novamente.';
     return;
   }
-  openButton.textContent = 'Entrar ↗';
-  pendingEmail = '';
-  showEmailStep();
-  showMessage('Você saiu da sua conta.');
+  showLanding();
 });
 
 supabase.auth.onAuthStateChange((_event, session) => {
-  if (session?.user) openButton.textContent = 'Minha conta';
-  else openButton.textContent = 'Entrar ↗';
+  if (session?.user) showDashboard(session.user);
+  else showLanding();
 });
+
+// Restaura automaticamente a sessão salva ao abrir ou atualizar o site.
+const { data: { session } } = await supabase.auth.getSession();
+if (session?.user) showDashboard(session.user);
+else showLanding();
