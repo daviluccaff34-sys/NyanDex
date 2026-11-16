@@ -1,148 +1,49 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.119.0';
-
 const SUPABASE_URL = 'https://jeqfsamjudycbkihfgda.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_IRJlWZcK5G9BZxMom1CUEg_Mg8mTlZW';
-
-// Supabase mantém a sessão no armazenamento local do navegador por padrão.
 const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-
 document.getElementById('year').textContent = new Date().getFullYear();
+const $ = id => document.getElementById(id);
+const modal = $('auth-modal'), dashboard = $('dashboard'), openButton = $('auth-open');
+const authForm = $('auth-form'), emailInput = $('auth-email'), passwordInput = $('auth-password');
+const message = $('auth-message'), title = $('auth-title'), description = $('auth-description'), submitButton = $('auth-submit');
+const loginTab = $('show-login'), signupTab = $('show-signup');
+let mode = 'login', currentUser = null, currentRepo = null;
+function showMessage(el, text, isError=false){el.textContent=text;el.classList.toggle('error',isError);}
+function openAuth(next='login'){modal.hidden=false;document.body.style.overflow='hidden';setMode(next);emailInput.focus();}
+function closeAuth(){modal.hidden=true;document.body.style.overflow='';}
+function setMode(next){mode=next;const signup=mode==='signup';title.textContent=signup?'Crie sua conta.':'Entre no seu universo.';description.textContent=signup?'Crie sua conta NyanDex com e-mail e senha.':'Acesse seus projetos com seu e-mail e senha.';submitButton.innerHTML=signup?'Criar conta <span>→</span>':'Entrar <span>→</span>';passwordInput.autocomplete=signup?'new-password':'current-password';loginTab.classList.toggle('active',!signup);signupTab.classList.toggle('active',signup);loginTab.setAttribute('aria-selected',String(!signup));signupTab.setAttribute('aria-selected',String(signup));showMessage(message,'');}
+function showDashboard(user){currentUser=user;modal.hidden=true;document.body.style.overflow='';document.querySelector('body > header').hidden=true;document.querySelector('body > main:not(#dashboard)').hidden=true;document.querySelector('body > footer').hidden=true;dashboard.hidden=false;const email=user.email||'';$('dashboard-user').textContent=email.split('@')[0]||'criador';$('dashboard-email').textContent=email;openButton.textContent='Minha conta';loadRepositories();}
+function showLanding(){currentUser=null;currentRepo=null;dashboard.hidden=true;document.querySelector('body > header').hidden=false;document.querySelector('body > main:not(#dashboard)').hidden=false;document.querySelector('body > footer').hidden=false;openButton.textContent='Entrar ↗';}
+function readableError(error){const raw=(error?.message||'').toLowerCase();if(raw.includes('invalid login credentials'))return'E-mail ou senha incorretos.';if(raw.includes('already registered'))return'Esse e-mail já tem uma conta. Tente entrar.';if(raw.includes('rate limit'))return'Muitas tentativas. Espere um pouco.';if(raw.includes('email not confirmed'))return'Confirme seu e-mail pelo link enviado antes de entrar.';return error?.message||'Não foi possível concluir. Tente novamente.';}
+openButton.addEventListener('click',()=>openAuth('login'));
+$('hero-login').addEventListener('click',()=>openAuth('signup'));
+loginTab.addEventListener('click',()=>setMode('login'));signupTab.addEventListener('click',()=>setMode('signup'));
+$('auth-close').addEventListener('click',closeAuth);$('auth-close-backdrop').addEventListener('click',closeAuth);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAuth();$('repo-modal').hidden=true;$('action-modal').hidden=true;}});
+authForm.addEventListener('submit',async e=>{e.preventDefault();const email=emailInput.value.trim().toLowerCase(),password=passwordInput.value;if(!email||!password)return;submitButton.disabled=true;submitButton.textContent=mode==='signup'?'Criando conta...':'Entrando...';showMessage(message,'');try{if(mode==='signup'){const {data,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:'https://nyandex.pages.dev/'}});if(error)throw error;if(data.session?.user)showDashboard(data.session.user);else showMessage(message,'Conta criada! Confira seu e-mail e confirme o cadastro antes de entrar.');}else{const {data,error}=await supabase.auth.signInWithPassword({email,password});if(error)throw error;if(data.user)showDashboard(data.user);}}catch(err){showMessage(message,readableError(err),true);}finally{submitButton.disabled=false;submitButton.innerHTML=mode==='signup'?'Criar conta <span>→</span>':'Entrar <span>→</span>';}});
 
-const modal = document.getElementById('auth-modal');
-const dashboard = document.getElementById('dashboard');
-const openButton = document.getElementById('auth-open');
-const authForm = document.getElementById('auth-form');
-const emailInput = document.getElementById('auth-email');
-const passwordInput = document.getElementById('auth-password');
-const message = document.getElementById('auth-message');
-const title = document.getElementById('auth-title');
-const description = document.getElementById('auth-description');
-const submitButton = document.getElementById('auth-submit');
-const loginTab = document.getElementById('show-login');
-const signupTab = document.getElementById('show-signup');
-let mode = 'login';
-
-function showMessage(text, isError = false) {
-  message.textContent = text;
-  message.classList.toggle('error', isError);
-}
-function openAuth(nextMode = 'login') {
-  modal.hidden = false;
-  document.body.style.overflow = 'hidden';
-  setMode(nextMode);
-  emailInput.focus();
-}
-function closeAuth() {
-  modal.hidden = true;
-  document.body.style.overflow = '';
-}
-function setMode(nextMode) {
-  mode = nextMode;
-  const signingUp = mode === 'signup';
-  title.textContent = signingUp ? 'Crie sua conta.' : 'Entre no seu universo.';
-  description.textContent = signingUp
-    ? 'Crie sua conta NyanDex com e-mail e senha.'
-    : 'Acesse seus projetos com seu e-mail e senha.';
-  submitButton.innerHTML = signingUp ? 'Criar conta <span>→</span>' : 'Entrar <span>→</span>';
-  passwordInput.autocomplete = signingUp ? 'new-password' : 'current-password';
-  loginTab.classList.toggle('active', !signingUp);
-  signupTab.classList.toggle('active', signingUp);
-  loginTab.setAttribute('aria-selected', String(!signingUp));
-  signupTab.setAttribute('aria-selected', String(signingUp));
-  forgotButton.hidden = signingUp;
-  showMessage('');
-}
-function showDashboard(user) {
-  modal.hidden = true;
-  document.body.style.overflow = '';
-  document.querySelector('body > header').hidden = true;
-  document.querySelector('body > main:not(#dashboard)').hidden = true;
-  document.querySelector('body > footer').hidden = true;
-  dashboard.hidden = false;
-  const email = user.email || '';
-  const shortName = email.includes('@') ? email.split('@')[0] : 'criador';
-  document.getElementById('dashboard-user').textContent = shortName;
-  document.getElementById('dashboard-email').textContent = email;
-  openButton.textContent = 'Minha conta';
-}
-function showLanding() {
-  dashboard.hidden = true;
-  document.querySelector('body > header').hidden = false;
-  document.querySelector('body > main:not(#dashboard)').hidden = false;
-  document.querySelector('body > footer').hidden = false;
-  openButton.textContent = 'Entrar ↗';
-}
-function readableError(error) {
-  const raw = (error?.message || '').toLowerCase();
-  if (raw.includes('invalid login credentials')) return 'E-mail ou senha incorretos.';
-  if (raw.includes('already registered') || raw.includes('already been registered')) return 'Esse e-mail já tem uma conta. Tente entrar.';
-  if (raw.includes('password') && raw.includes('least')) return 'Use uma senha mais forte, com pelo menos 8 caracteres.';
-  if (raw.includes('rate limit') || raw.includes('too many')) return 'Muitas tentativas. Espere um pouco e tente novamente.';
-  if (raw.includes('email not confirmed')) return 'Confirme seu e-mail pelo link enviado antes de entrar.';
-  return error?.message || 'Não foi possível concluir. Confira os dados e tente novamente.';
-}
-
-openButton.addEventListener('click', () => openAuth('login'));
-document.getElementById('hero-login').addEventListener('click', () => openAuth('signup'));
-loginTab.addEventListener('click', () => setMode('login'));
-signupTab.addEventListener('click', () => setMode('signup'));
-document.getElementById('auth-close').addEventListener('click', closeAuth);
-document.getElementById('auth-close-backdrop').addEventListener('click', closeAuth);
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && !modal.hidden) closeAuth();
-});
-
-authForm.addEventListener('submit', async event => {
-  event.preventDefault();
-  const email = emailInput.value.trim().toLowerCase();
-  const password = passwordInput.value;
-  if (!email || !password) return;
-  submitButton.disabled = true;
-  submitButton.textContent = mode === 'signup' ? 'Criando conta...' : 'Entrando...';
-  showMessage('');
-  try {
-    if (mode === 'signup') {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        });
-      if (error) throw error;
-      if (data.session?.user) {
-        showDashboard(data.session.user);
-      } else {
-        showMessage('Conta criada! Confira seu e-mail e clique no link de confirmação para ativá-la.');
-      }
-    } else {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      if (data.user) showDashboard(data.user);
-    }
-  } catch (error) {
-    showMessage(readableError(error), true);
-  } finally {
-    submitButton.disabled = false;
-    submitButton.innerHTML = mode === 'signup' ? 'Criar conta <span>→</span>' : 'Entrar <span>→</span>';
-  }
-});
-
-document.getElementById('create-first-repo').addEventListener('click', () => {
-  document.getElementById('repo-message').textContent = 'A criação de repositórios está sendo construída. Seus projetos ficarão aqui!';
-});
-document.getElementById('dashboard-signout').addEventListener('click', async () => {
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    document.getElementById('repo-message').textContent = 'Não foi possível sair agora. Tente novamente.';
-    return;
-  }
-  showLanding();
-});
-
-supabase.auth.onAuthStateChange((_event, session) => {
-  if (session?.user) showDashboard(session.user);
-  else showLanding();
-});
-
-// Restaura automaticamente a sessão salva ao abrir ou atualizar o site.
-const { data: { session } } = await supabase.auth.getSession();
-if (session?.user) showDashboard(session.user);
-else showLanding();
+function slugify(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80);}
+async function loadRepositories(){const {data,error}=await supabase.from('repositories').select('*').order('updated_at',{ascending:false});if(error){showMessage($('repo-message'),error.message,true);return;}const list=$('repo-list');list.replaceChildren();$('repos-empty').hidden=data.length!==0;for(const repo of data){const card=document.createElement('button');card.className='repo-card';card.type='button';const name=document.createElement('strong');name.textContent=repo.name;const desc=document.createElement('span');desc.textContent=repo.description||'Sem descrição';const vis=document.createElement('small');vis.textContent=repo.visibility==='public'?'Público':'Privado';card.append(name,desc,vis);card.addEventListener('click',()=>openRepository(repo));list.append(card);}}
+function showRepoHome(){currentRepo=null;$('repo-home').hidden=false;$('workspace').hidden=true;loadRepositories();}
+$('create-first-repo').addEventListener('click',()=>{$('repo-modal').hidden=false;showMessage($('repo-create-message'),'');$('repo-name').focus();});
+$('create-first-repo-empty').addEventListener('click',()=>$('create-first-repo').click());
+$('repo-modal-close').addEventListener('click',()=>$('repo-modal').hidden=true);
+$('repo-create-form').addEventListener('submit',async e=>{e.preventDefault();const name=$('repo-name').value.trim(),slug=slugify(name);if(!slug){showMessage($('repo-create-message'),'Escolha um nome válido.',true);return;}const btn=e.submitter;btn.disabled=true;try{const {data,error}=await supabase.from('repositories').insert({owner_id:currentUser.id,name,slug,description:$('repo-description').value.trim(),visibility:$('repo-visibility').value}).select().single();if(error)throw error;$('repo-modal').hidden=true;e.target.reset();await loadRepositories();openRepository(data);}catch(err){showMessage($('repo-create-message'),err.message,true);}finally{btn.disabled=false;}});
+async function openRepository(repo){currentRepo=repo;$('repo-home').hidden=true;$('workspace').hidden=false;$('workspace-title').textContent=repo.name;$('workspace-description').textContent=repo.description;$('workspace-visibility').textContent=repo.visibility==='public'?'PÚBLICO':'PRIVADO';$('settings-name').value=repo.name;$('settings-description').value=repo.description||'';$('settings-visibility').value=repo.visibility;switchPanel('code');await Promise.all([loadCodeFiles(),loadAssets(),loadActions()]);}
+$('back-repos').addEventListener('click',showRepoHome);
+function switchPanel(name){document.querySelectorAll('.workspace-tab').forEach(b=>b.classList.toggle('active',b.dataset.panel===name));document.querySelectorAll('.workspace-panel').forEach(p=>p.hidden=p.id!=='panel-'+name);}
+document.querySelectorAll('.workspace-tab').forEach(b=>b.addEventListener('click',()=>switchPanel(b.dataset.panel)));
+async function loadCodeFiles(){const {data,error}=await supabase.from('repository_files').select('id,path,content').eq('repository_id',currentRepo.id).order('path');if(error){showMessage($('code-message'),error.message,true);return;}const box=$('code-file-list');box.replaceChildren();for(const file of data){const b=document.createElement('button');b.type='button';b.textContent=file.path;b.addEventListener('click',()=>{$('code-path').value=file.path;$('code-content').value=file.content;});box.append(b);}}
+$('new-code-file').addEventListener('click',()=>{$('code-path').value='';$('code-content').value='';$('code-path').focus();});
+$('save-code').addEventListener('click',async()=>{const path=$('code-path').value.trim(),content=$('code-content').value;if(!path||path.startsWith('/')||path.split('/').includes('..')){showMessage($('code-message'),'Informe um caminho válido, sem ../.',true);return;}const {error}=await supabase.from('repository_files').upsert({repository_id:currentRepo.id,owner_id:currentUser.id,path,content,updated_at:new Date().toISOString()},{onConflict:'repository_id,path'});if(error)showMessage($('code-message'),error.message,true);else{showMessage($('code-message'),'Arquivo salvo!');loadCodeFiles();}});
+async function loadAssets(){const {data,error}=await supabase.from('repository_assets').select('*').eq('repository_id',currentRepo.id).order('created_at',{ascending:false});if(error){showMessage($('file-message'),error.message,true);return;}const box=$('asset-list');box.replaceChildren();for(const asset of data){const row=document.createElement('div');row.className='asset-row';const name=document.createElement('span');name.textContent=asset.file_name;const size=document.createElement('small');size.textContent=Math.ceil(asset.size_bytes/1024)+' KB';row.append(name,size);box.append(row);}}
+$('import-files').addEventListener('change',async e=>{const files=[...e.target.files];for(const file of files){if(file.size>10*1024*1024){showMessage($('file-message'),file.name+' excede 10 MB.',true);continue;}const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const path=currentUser.id+'/'+currentRepo.id+'/'+crypto.randomUUID()+'-'+safeName;const {error:uploadError}=await supabase.storage.from('nyandex-repo-files').upload(path,file,{upsert:false});if(uploadError){showMessage($('file-message'),uploadError.message,true);continue;}const {error:metaError}=await supabase.from('repository_assets').insert({repository_id:currentRepo.id,owner_id:currentUser.id,file_name:file.name,storage_path:path,mime_type:file.type||'application/octet-stream',size_bytes:file.size});if(metaError)showMessage($('file-message'),metaError.message,true);else showMessage($('file-message'),file.name+' importado!');}e.target.value='';loadAssets();});
+async function loadActions(){const {data,error}=await supabase.from('nyan_actions').select('*').eq('repository_id',currentRepo.id).order('created_at',{ascending:false});if(error){showMessage($('action-list'),error.message,true);return;}const box=$('action-list');box.replaceChildren();for(const action of data){const card=document.createElement('article');card.className='action-card';const name=document.createElement('strong');name.textContent=action.name;const desc=document.createElement('p');desc.textContent=action.description||'Sem descrição';const trigger=document.createElement('small');trigger.textContent='Gatilho: '+(action.trigger_type==='manual'?'manual':'atualização do repositório');card.append(name,desc,trigger);box.append(card);}}
+$('new-action').addEventListener('click',()=>{$('action-modal').hidden=false;showMessage($('action-create-message'),'');});
+$('action-modal-close').addEventListener('click',()=>$('action-modal').hidden=true);
+$('action-create-form').addEventListener('submit',async e=>{e.preventDefault();const steps=$('action-steps').value.split('\n').map(s=>s.trim()).filter(Boolean);const btn=e.submitter;btn.disabled=true;try{const {error}=await supabase.from('nyan_actions').insert({repository_id:currentRepo.id,owner_id:currentUser.id,name:$('action-name').value.trim(),description:$('action-description').value.trim(),trigger_type:$('action-trigger').value,steps});if(error)throw error;$('action-modal').hidden=true;e.target.reset();await loadActions();}catch(err){showMessage($('action-create-message'),err.message,true);}finally{btn.disabled=false;}});
+$('repo-settings-form').addEventListener('submit',async e=>{e.preventDefault();const {data,error}=await supabase.from('repositories').update({name:$('settings-name').value.trim(),slug:slugify($('settings-name').value),description:$('settings-description').value.trim(),visibility:$('settings-visibility').value,updated_at:new Date().toISOString()}).eq('id',currentRepo.id).select().single();if(error)showMessage($('settings-message'),error.message,true);else{currentRepo=data;$('workspace-title').textContent=data.name;$('workspace-description').textContent=data.description;$('workspace-visibility').textContent=data.visibility==='public'?'PÚBLICO':'PRIVADO';showMessage($('settings-message'),'Configurações salvas!');}});
+$('dashboard-signout').addEventListener('click',async()=>{const {error}=await supabase.auth.signOut();if(error){showMessage($('repo-message'),'Não foi possível sair agora.',true);return;}showLanding();});
+supabase.auth.onAuthStateChange((_event,session)=>{if(session?.user)showDashboard(session.user);else showLanding();});
+const {data:{session}}=await supabase.auth.getSession();if(session?.user)showDashboard(session.user);else showLanding();
