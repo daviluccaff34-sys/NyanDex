@@ -15,3 +15,31 @@ h1{font-size:clamp(52px,7vw,82px);line-height:.99;letter-spacing:-5px;margin:22p
 footer{max-width:1180px;margin:auto;padding:25px 28px;border-top:1px solid #ffffff18;display:flex;align-items:center;justify-content:space-between;gap:20px;color:#a99abf;font-size:11px}.footer-brand{font-size:18px;color:var(--text)}.footer-brand img{width:28px;height:28px}
 @media(max-width:800px){.hero{grid-template-columns:1fr;padding-top:65px}.hero-art{height:330px;grid-row:1}.hero-copy{grid-row:2}.feature-grid{grid-template-columns:repeat(2,1fr)}.about{grid-template-columns:75px 1fr}.about>p{grid-column:2}nav{gap:15px}}
 @media(max-width:520px){.topbar{padding:0 18px;height:70px}nav{display:none}.hero{padding:45px 20px}.hero-art{height:270px}.orbit{width:260px;height:260px}.orbit-two{width:310px;height:190px}.hero h1{letter-spacing:-3px}.features{padding:65px 18px}.feature-grid{grid-template-columns:1fr}.feature-card{min-height:190px}.about{padding:65px 20px;grid-template-columns:1fr;gap:20px}.about>p{grid-column:auto}footer{padding:22px 18px;flex-wrap:wrap}footer>span{order:3;width:100%}}
+/* Email OTP authentication */
+[hidden]{display:none!important}
+button{font:inherit;cursor:pointer}
+.top-cta{background:transparent;color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif}
+.top-cta:hover{border-color:var(--pink);color:var(--pink)}
+.hero-actions button{border:0}
+.auth-modal{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:18px}
+.auth-backdrop{position:absolute;inset:0;width:100%;height:100%;border:0;background:#080511d9;backdrop-filter:blur(8px)}
+.auth-dialog{position:relative;width:min(100%,440px);max-height:calc(100dvh - 36px);overflow:auto;padding:34px 30px 27px;background:#211833;border:1px solid #ff75c866;border-radius:14px;box-shadow:0 24px 90px #000a;text-align:center}
+.auth-close{position:absolute;right:14px;top:10px;border:0;background:transparent;color:#b9accd;font-size:28px;line-height:1}
+.auth-close:hover{color:var(--pink)}
+.auth-mascot{width:74px;height:58px;object-fit:contain;image-rendering:pixelated;margin:0 auto 12px}
+.auth-dialog h2{font-size:29px;letter-spacing:-1px;margin:8px 0}
+.auth-description{font-size:14px;line-height:1.6;color:var(--muted);margin:0 auto 24px;max-width:340px}
+.auth-form{text-align:left;display:grid;gap:10px}
+.auth-form label{font:11px 'DM Mono',monospace;letter-spacing:1px;color:#d6c9e8;text-transform:uppercase}
+.auth-form input{width:100%;height:48px;border:1px solid #ffffff30;border-radius:7px;background:#120d23;color:var(--text);padding:0 14px;font:15px 'Space Grotesk',sans-serif;outline:none}
+.auth-form input:focus{border-color:var(--pink);box-shadow:0 0 0 3px #ff75c822}
+#auth-code{text-align:center;letter-spacing:12px;font:700 24px 'DM Mono',monospace;padding-left:24px}
+.auth-submit{width:100%;margin-top:8px;display:flex;justify-content:center;align-items:center;gap:12px}
+.auth-text-button{border:0;background:transparent;color:var(--cyan);padding:7px;font-size:12px}
+.auth-text-button:hover{text-decoration:underline}
+.auth-message{min-height:20px;margin:15px 0 0;color:var(--yellow);font-size:12px;line-height:1.5}
+.auth-message.error{color:#ff8caa}
+.auth-success{color:#8effbd;font-size:13px}
+.auth-account-email{color:var(--muted);font-size:14px;overflow-wrap:anywhere}
+.auth-legal{margin:17px 0 0;color:#887a9e;font-size:10px;line-height:1.5}
+@media(max-width:520px){.auth-dialog{padding:30px 21px 23px}.auth-dialog h2{font-size:25px}}
