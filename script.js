@@ -8,7 +8,9 @@ const modal = $('auth-modal'), dashboard = $('dashboard'), openButton = $('auth-
 const authForm = $('auth-form'), emailInput = $('auth-email'), passwordInput = $('auth-password');
 const message = $('auth-message'), title = $('auth-title'), description = $('auth-description'), submitButton = $('auth-submit');
 const loginTab = $('show-login'), signupTab = $('show-signup');
-let mode = 'login', currentUser = null, currentRepo = null, captchaToken = '';\nwindow.onNyanTurnstileSuccess = token => { captchaToken = token; };\nwindow.onNyanTurnstileExpired = () => { captchaToken = ''; };
+let mode = 'login', currentUser = null, currentRepo = null, captchaToken = '';
+window.onNyanTurnstileSuccess = token => { captchaToken = token; };
+window.onNyanTurnstileExpired = () => { captchaToken = ''; };
 function showMessage(el, text, isError=false){el.textContent=text;el.classList.toggle('error',isError);}
 function openAuth(next='login'){modal.hidden=false;document.body.style.overflow='hidden';setMode(next);emailInput.focus();}
 function closeAuth(){modal.hidden=true;document.body.style.overflow='';}
