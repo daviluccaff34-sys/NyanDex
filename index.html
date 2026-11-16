@@ -81,6 +81,27 @@
   </main>
   <footer><a class="brand footer-brand" href="#"><img src="assets/nyan-cat.svg" alt=""><span>Nyan<span class="brand-accent">Dex</span></span></a><span>© <span id="year"></span> NyanDex · Feito com pixels e imaginação.</span><a href="#top">Voltar ao topo ↑</a></footer>
 
+  <main class="dashboard" id="dashboard" hidden>
+    <section class="dashboard-welcome">
+      <p class="eyebrow"><span class="status-dot"></span> SEU UNIVERSO NYANDEX</p>
+      <h1>Olá, <span id="dashboard-user">criador</span>!</h1>
+      <p class="hero-text">Tudo pronto para tirar suas ideias do papel.</p>
+    </section>
+    <section class="repos-empty" id="repos-empty">
+      <img src="assets/nyan-cat.svg" alt="" class="empty-mascot">
+      <p class="eyebrow">SEUS REPOSITÓRIOS</p>
+      <h2>Crie seu primeiro repo!!</h2>
+      <p>Seu espaço de projetos começa aqui. Em breve você poderá criar e organizar seus repositórios diretamente no NyanDex.</p>
+      <button class="button button-primary" id="create-first-repo" type="button">Criar meu primeiro repo <span>→</span></button>
+      <p class="auth-message" id="repo-message" role="status" aria-live="polite"></p>
+    </section>
+    <footer class="dashboard-footer">
+      <a class="brand footer-brand" href="#"><img src="assets/nyan-cat.svg" alt=""><span>Nyan<span class="brand-accent">Dex</span></span></a>
+      <span id="dashboard-email"></span>
+      <button class="auth-text-button" id="dashboard-signout" type="button">Sair da conta</button>
+    </footer>
+  </main>
+
   <div class="auth-modal" id="auth-modal" hidden>
     <button class="auth-backdrop" id="auth-close-backdrop" type="button" aria-label="Fechar janela"></button>
     <section class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title">
@@ -88,30 +109,22 @@
       <img class="auth-mascot" src="assets/nyan-cat.svg" alt="">
       <p class="eyebrow">NYANDEX ACCOUNT</p>
       <h2 id="auth-title">Entre no seu universo.</h2>
-      <p class="auth-description" id="auth-description">Digite seu e-mail. Vamos enviar um código de 6 dígitos para confirmar que ele é seu.</p>
+      <p class="auth-description" id="auth-description">Entre na sua conta ou crie uma nova para começar.</p>
 
-      <form id="email-form" class="auth-form">
-        <label for="auth-email">Seu e-mail</label>
-        <input id="auth-email" name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" required maxlength="254">
-        <button class="button button-primary auth-submit" type="submit">Enviar código <span>→</span></button>
-      </form>
-
-      <form id="otp-form" class="auth-form" hidden>
-        <label for="auth-code">Código de confirmação</label>
-        <input id="auth-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required>
-        <button class="button button-primary auth-submit" type="submit">Confirmar e entrar <span>→</span></button>
-        <button class="auth-text-button" id="resend-code" type="button">Enviar outro código</button>
-        <button class="auth-text-button" id="change-email" type="button">Trocar e-mail</button>
-      </form>
-
-      <div class="auth-account" id="auth-account" hidden>
-        <p class="auth-success">● Você está conectado!</p>
-        <p class="auth-account-email" id="auth-account-email"></p>
-        <button class="button button-quiet auth-submit" id="auth-signout" type="button">Sair da conta</button>
+      <div class="auth-tabs" role="tablist" aria-label="Tipo de acesso">
+        <button class="auth-tab active" id="show-login" type="button" role="tab" aria-selected="true">Entrar</button>
+        <button class="auth-tab" id="show-signup" type="button" role="tab" aria-selected="false">Criar conta</button>
       </div>
+      <form id="auth-form" class="auth-form">
+        <label for="auth-email">E-mail</label>
+        <input id="auth-email" name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" required maxlength="254">
+        <label for="auth-password">Senha</label>
+        <input id="auth-password" name="password" type="password" autocomplete="current-password" placeholder="Sua senha" required minlength="8" maxlength="72">
+        <button class="button button-primary auth-submit" id="auth-submit" type="submit">Entrar <span>→</span></button>
+      </form>
+      <button class="auth-text-button forgot-password" id="forgot-password" type="button">Esqueci minha senha</button>
       <p class="auth-message" id="auth-message" role="status" aria-live="polite"></p>
-      <p class="auth-legal">Ao continuar, você confirma que tem acesso a esse endereço de e-mail.</p>
+      <p class="auth-legal">Use um e-mail ao qual você tenha acesso. Nunca compartilhe sua senha.</p>
     </section>
   </div>
 </body>
-</html>
