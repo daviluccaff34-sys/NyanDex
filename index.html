@@ -8,7 +8,7 @@
   <title>NyanDex — Your creative universe</title>
   <link rel="icon" href="assets/nyan-cat.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
-  <script src="script.js" defer></script>
+  <script type="module" src="script.js"></script>
 </head>
 <body>
   <div class="scanlines" aria-hidden="true"></div>
@@ -21,7 +21,7 @@
       <a href="#recursos">Recursos</a>
       <a href="#sobre">Sobre</a>
     </nav>
-    <a class="top-cta" href="#recursos">Explorar <span aria-hidden="true">↗</span></a>
+    <button class="top-cta" id="auth-open" type="button">Entrar <span aria-hidden="true">↗</span></button>
   </header>
   <main>
     <section class="hero">
@@ -30,7 +30,7 @@
         <h1>Seus projetos.<br><span>Seu universo.</span></h1>
         <p class="hero-text">Crie, organize e compartilhe seus projetos em um só lugar. Bem-vindo ao NyanDex!</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="#recursos">Conhecer recursos <span>→</span></a>
+          <button class="button button-primary" id="hero-login" type="button">Criar conta grátis <span>→</span></button>
           <a class="button button-quiet" href="#sobre">Saiba mais</a>
         </div>
         <div class="hero-foot"><span>✦</span> Feito para quem gosta de criar coisas incríveis.</div>
@@ -80,5 +80,38 @@
     </section>
   </main>
   <footer><a class="brand footer-brand" href="#"><img src="assets/nyan-cat.svg" alt=""><span>Nyan<span class="brand-accent">Dex</span></span></a><span>© <span id="year"></span> NyanDex · Feito com pixels e imaginação.</span><a href="#top">Voltar ao topo ↑</a></footer>
+
+  <div class="auth-modal" id="auth-modal" hidden>
+    <button class="auth-backdrop" id="auth-close-backdrop" type="button" aria-label="Fechar janela"></button>
+    <section class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+      <button class="auth-close" id="auth-close" type="button" aria-label="Fechar">×</button>
+      <img class="auth-mascot" src="assets/nyan-cat.svg" alt="">
+      <p class="eyebrow">NYANDEX ACCOUNT</p>
+      <h2 id="auth-title">Entre no seu universo.</h2>
+      <p class="auth-description" id="auth-description">Digite seu e-mail. Vamos enviar um código de 6 dígitos para confirmar que ele é seu.</p>
+
+      <form id="email-form" class="auth-form">
+        <label for="auth-email">Seu e-mail</label>
+        <input id="auth-email" name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" required maxlength="254">
+        <button class="button button-primary auth-submit" type="submit">Enviar código <span>→</span></button>
+      </form>
+
+      <form id="otp-form" class="auth-form" hidden>
+        <label for="auth-code">Código de confirmação</label>
+        <input id="auth-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required>
+        <button class="button button-primary auth-submit" type="submit">Confirmar e entrar <span>→</span></button>
+        <button class="auth-text-button" id="resend-code" type="button">Enviar outro código</button>
+        <button class="auth-text-button" id="change-email" type="button">Trocar e-mail</button>
+      </form>
+
+      <div class="auth-account" id="auth-account" hidden>
+        <p class="auth-success">● Você está conectado!</p>
+        <p class="auth-account-email" id="auth-account-email"></p>
+        <button class="button button-quiet auth-submit" id="auth-signout" type="button">Sair da conta</button>
+      </div>
+      <p class="auth-message" id="auth-message" role="status" aria-live="polite"></p>
+      <p class="auth-legal">Ao continuar, você confirma que tem acesso a esse endereço de e-mail.</p>
+    </section>
+  </div>
 </body>
 </html>
