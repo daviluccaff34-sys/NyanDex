@@ -20,7 +20,6 @@ const description = document.getElementById('auth-description');
 const submitButton = document.getElementById('auth-submit');
 const loginTab = document.getElementById('show-login');
 const signupTab = document.getElementById('show-signup');
-const forgotButton = document.getElementById('forgot-password');
 let mode = 'login';
 
 function showMessage(text, isError = false) {
@@ -106,8 +105,7 @@ authForm.addEventListener('submit', async event => {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: window.location.origin }
-      });
+        });
       if (error) throw error;
       if (data.session?.user) {
         showDashboard(data.session.user);
@@ -124,28 +122,6 @@ authForm.addEventListener('submit', async event => {
   } finally {
     submitButton.disabled = false;
     submitButton.innerHTML = mode === 'signup' ? 'Criar conta <span>→</span>' : 'Entrar <span>→</span>';
-  }
-});
-
-forgotButton.addEventListener('click', async () => {
-  const email = emailInput.value.trim().toLowerCase();
-  if (!email) {
-    showMessage('Digite seu e-mail primeiro para receber o link de recuperação.', true);
-    emailInput.focus();
-    return;
-  }
-  forgotButton.disabled = true;
-  showMessage('Enviando link de recuperação...');
-  try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin
-    });
-    if (error) throw error;
-    showMessage('Se esse e-mail tiver uma conta, enviaremos um link para redefinir a senha.');
-  } catch (error) {
-    showMessage(readableError(error), true);
-  } finally {
-    forgotButton.disabled = false;
   }
 });
 
