@@ -87,6 +87,13 @@
       <p class="eyebrow"><span class="status-dot"></span> SEU UNIVERSO NYANDEX</p>
       <h1>Olá, <span id="dashboard-user">criador</span>!</h1>
       <p class="hero-text">Tudo pronto para tirar suas ideias do papel.</p>
+      <button class="button button-quiet" id="admin-open" type="button" hidden>⚙ Moderação</button>
+    </section>
+    <section class="admin-tools" id="admin-tools" hidden>
+      <div class="repo-home-heading"><div><p class="eyebrow">NYANDEX STAFF</p><h2>Moderação de contas</h2></div><button class="auth-text-button" id="admin-close" type="button">← Voltar ao site</button></div>
+      <p class="admin-description">Gerencie contas sem sair do NyanDex. A área normal do site continua disponível.</p>
+      <div id="admin-user-list" class="admin-user-list"></div>
+      <p id="admin-message" class="auth-message" role="status"></p>
     </section>
     <section class="repo-home" id="repo-home">
       <div class="repo-home-heading"><div><p class="eyebrow">SEUS REPOSITÓRIOS</p><h2>Seu espaço de criação.</h2></div><a class="button button-primary" id="create-first-repo" href="/new">+ Novo repositório</a></div>
@@ -146,6 +153,8 @@
         <button class="auth-tab" id="show-signup" type="button" role="tab" aria-selected="false">Criar conta</button>
       </div>
       <form id="auth-form" class="auth-form">
+        <label for="auth-username" id="auth-username-label" hidden>Username</label>
+        <input id="auth-username" name="username" type="text" autocomplete="username" placeholder="Seu username" minlength="3" maxlength="24" pattern="[A-Za-z0-9 _-]{3,24}" hidden>
         <label for="auth-email">E-mail</label>
         <input id="auth-email" name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" required maxlength="254">
         <label for="auth-password">Senha</label>
